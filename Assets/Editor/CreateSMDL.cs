@@ -65,6 +65,11 @@ public class SMDLModelCreator : EditorWindow
     private float[] scaleValues = new float[] { 1f, 0.1f, 0.01f, 0.001f };
     private int scaleIndex = 3;
 
+    //Elements associated with door auto detection
+    private bool autoDetectDoors = true;
+    private float minSurfaceRatio = 0.5f;
+    private float maxRaycastDistance = -1;
+
     #endregion SCRIPTABLE_VALUES
 
     #region PROCEDURE_VALUES
@@ -247,6 +252,14 @@ public class SMDLModelCreator : EditorWindow
         EditorGUILayout.LabelField("Models unit");
         scaleIndex = EditorGUILayout.Popup(scaleIndex, scaleLabels);
 
+        autoDetectDoors = EditorGUILayout.Toggle("Door auto detection", autoDetectDoors);
+
+        if(autoDetectDoors)
+        {
+            minSurfaceRatio = EditorGUILayout.FloatField("Minmal surface", minSurfaceRatio);
+            maxRaycastDistance = EditorGUILayout.FloatField("Max raycast dist.", maxRaycastDistance);
+        }
+
         GUILayout.FlexibleSpace();
 
         GUILayout.BeginHorizontal();
@@ -309,6 +322,13 @@ public class SMDLModelCreator : EditorWindow
             //Creating asset in project from imported model
             Debug.Log("Setting imported model properties");
             CreateAssetFromImportedModel();
+
+            //Detecting doors automatically if set
+            if (autoDetectDoors)
+            {
+                Debug.Log("Setting imported model properties");
+                DetectDoorAutomaticallyInModel();
+            }
 
             //Creating prefab from asset and setting its asset bundle name
             Debug.Log("Creating prefab from asset and setting its asset bundle name");
@@ -458,6 +478,15 @@ public class SMDLModelCreator : EditorWindow
         createdObject.name = TemporaryModelName;
 
         _modelsAsset = createdObject;
+    }
+
+    /// <summary>
+    /// Method for detecting doors in model automatically
+    /// </summary>
+    private void DetectDoorAutomaticallyInModel()
+    {
+        DoorAutoDetector doorDetector = new DoorAutoDetector(ModelsAsset, minSurfaceRatio, maxRaycastDistance);
+        doorDetector.DetectAndRenameDoorElementsInSwitchboard();
     }
 
     /// <summary>
