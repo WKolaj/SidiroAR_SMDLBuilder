@@ -70,6 +70,7 @@ public class SMDLModelCreator : EditorWindow
     private float minSurfaceRatio = 0.5f;
     private float maxRaycastDistance = -1;
 
+
     #endregion SCRIPTABLE_VALUES
 
     #region PROCEDURE_VALUES
@@ -132,11 +133,19 @@ public class SMDLModelCreator : EditorWindow
         }
     }
 
-    private string ModelsAssetBundleFilePath
+    private string ModelsAssetBundleFilePathAndroid
     {
         get
         {
             return Path.Combine(AssetBundlesDirPath, TemporaryModelName + ".smdl");
+        }
+    }
+
+    private string ModelsAssetBundleFilePathIOS
+    {
+        get
+        {
+            return Path.Combine(AssetBundlesDirPath, TemporaryModelName + ".ismdl");
         }
     }
 
@@ -334,9 +343,17 @@ public class SMDLModelCreator : EditorWindow
             Debug.Log("Creating prefab from asset and setting its asset bundle name");
             CreatePrefabFromModelsAsset();
 
-            //Generating asset bundles
+            //Generating asset bundles for andoird
             Debug.Log("Creating asset bundles");
-            CreateAssetBundles();
+            CreateAssetBundlesForAndroid();
+
+            //Changing prefab name to ios name
+            Debug.Log("Changing prefab name to IOS");
+            SetPrefabIOSName();
+
+            //Generating asset bundles for andoird
+            Debug.Log("Creating asset bundles");
+            CreateAssetBundlesForIOS();
 
             //Exporting asset bundle file to external dir
             Debug.Log("Exporting asset bundle file...");
@@ -503,18 +520,40 @@ public class SMDLModelCreator : EditorWindow
     }
 
     /// <summary>
+    /// Method for setting name of the prefab for asmdl (IOS) model
+    /// </summary>
+    private void SetPrefabIOSName()
+    {
+        //Setting name for created prefab
+        AssetImporter.GetAtPath(ModelsPrefabPath).SetAssetBundleNameAndVariant(TemporaryModelName, "ismdl");
+
+    }
+
+    /// <summary>
     /// Method for creating asset bundles from project
     /// </summary>
-    private void CreateAssetBundles()
+    private void CreateAssetBundlesForAndroid()
     {
-        BuildPipeline.BuildAssetBundles(AssetBundlesDirPath, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.Android);
+        BuildPipeline.BuildAssetBundles(AssetBundlesDirPath, BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.Android);
+    }
+
+    /// <summary>
+    /// Method for creating asset bundles from project
+    /// </summary>
+    private void CreateAssetBundlesForIOS()
+    {
+        BuildPipeline.BuildAssetBundles(AssetBundlesDirPath, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.iOS);
     }
 
     private void ExportAssetBundleFile()
     {
-        //Saving asset bundle file to external dir
-        string assetBundleExportFilePath = EditorUtility.SaveFilePanel("Save SMDL to file", "", ModelName, "smdl");
-        File.Copy(ModelsAssetBundleFilePath, assetBundleExportFilePath, true);
+        //Saving asset bundle file to external dir - Android
+        string assetBundleExportIOSFilePath = EditorUtility.SaveFilePanel("Save SMDL to file", "", ModelName, "smdl");
+        File.Copy(ModelsAssetBundleFilePathAndroid, assetBundleExportIOSFilePath, true);
+
+        //Saving asset bundle file to external dir - iOS
+        string assetBundleExportIOSFilePathIOS = Path.ChangeExtension(assetBundleExportIOSFilePath, "ismdl");
+        File.Copy(ModelsAssetBundleFilePathIOS, assetBundleExportIOSFilePathIOS, true);
     }
 
     #endregion CREATE_SMDL_PROCEDURE
