@@ -66,7 +66,7 @@ public class SMDLModelCreator : EditorWindow
     private int scaleIndex = 3;
 
     //Elements associated with door auto detection
-    private bool autoDetectDoors = true;
+    private bool autoDetectDoors = false;
     private float minSurfaceRatio = 0.5f;
     private float maxRaycastDistance = -1;
 
