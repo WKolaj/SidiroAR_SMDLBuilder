@@ -29,7 +29,7 @@ public class AutoGenerateSMDL
     const string modelContainerName = "_ModelContainer_";
     const string inputDirName = "Input";
     const string outputDirName = "Output";
-    const float scale = 0.01f;
+    const float scale = 0.1f;
 
     #endregion CONSTANTS
 
